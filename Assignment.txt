@@ -1,0 +1,78 @@
+Assignment: Polynomial Regression
+1. Introduction
+In this assignment, you will work with two personalised datasets and develop polynomial regression models to predict a continuous target variable y from the given input variables. The
+datasets are individually assigned to each student. Therefore, you must use the datasets corresponding to your own roll number and problem IDs.
+The objective is to obtain accurate predictions on the provided test datasets using only
+polynomial regression.
+2. Problem Statements
+You are the Lead Renewable Energy Engineer managing a multi-stage geothermal power plant
+expansion project.
+Phase 1: Power Plant Steam Turbine Optimization (var1)
+Scenario: Before drilling new production wells, you must optimize the surface energy generation facility. Your plant operates a multi-stage steam turbine system. Due to slight variations
+in manufacturing tolerances and local water chemistry across regional plants, your specific plant
+setup behaves uniquely compared to your colleagues’ facilities.
+The turbine efficiency is governed by six key operational parameters (x1, x2, x3, x4, x5, x6),
+representing percentage deviations:
+x1 High-pressure steam valve adjustment
+x2 Condenser coolant flow rate adjustment
+x3 Re-injection pump hydraulic pressure
+x4 Turbine blade pitch angle
+x5 Non-condensable gas exhaust valve rate
+x6 Steam inlet pressure adjustment
+Based on these settings, the plant outputs a Net Power Score (y). The power score can be
+modeled using a polynomial of a moderate degree (up to degree 10) using the given parameters.
+Your Task: Using historical plant calibration logs (train), build a polynomial regression
+model to predict the Net Power Score. 
+Phase 2: Subterranean Thermal Reservoir Mapping (var2)
+Scenario: With your surface plant optimized, Phase 2 requires you to select the exact coordinates for drilling new geothermal extraction wells. You are assigned to map a specific,
+high-potential geological survey block.
+You deploy seismic and thermal probe sensors across a 3D grid around your central basecamp. The variables x1, x2, and x3 represent spatial coordinate offsets in meters from the site
+landmark:
+• x1: East-West coordinate offset
+• x2: North-South coordinate offset
+1
+• x3: Vertical depth offset relative to the basecamp
+At each 3D coordinate, the sensor network records a Thermal Anomaly Score (y).
+Because of complex geological structures, the heat map in your sector resembles a highdegree polynomial (up to degree 20).
+Your Task: Due to survey budget limits, you have only collected physical core samples at a
+random scatter of 3D points (train). You must build a model to predict the Thermal Anomaly
+Score across the remaining planned drilling sites (test) to identify the exact coordinates and
+depth for drilling high-yield wells. 
+2. Dataset Format
+Each student will receive two preprocessed and cleaned datasets for two different problems.
+The files follow the naming convention:
+<ROLLNO> {train/test} var<PRBID>.csv
+For example,
+BT2024001_train_var1.csv
+BT2024001_test_var1.csv
+BT2024001_train_var2.csv
+BT2024001_test_var2.csv
+where:
+• ROLLNO denotes the student’s roll number.
+• train and test identify the training and testing datasets respectively.
+• PRBID identifies the assigned problem.
+The training and testing files corresponding to each problem must be treated as separate
+datasets. The target variable is y.
+Download datasets here
+4. Evaluation Metrics
+Your predictions on the test sets will be evaluated against the hidden ground truth. The
+primary metrics for evaluation will be:
+• Mean Squared Error (MSE): To measure the average squared difference between your
+predicted values and the actual values.
+• R2 Score (Coefficient of Determination): To evaluate how well your polynomial
+model captures the variance of the target variable.
+You must carefully select the optimal degree for your polynomial models to avoid underfitting
+or overfitting the uniquely generated data provided to you. A polynomial of degree x means for
+each term, the sum of the powers of features adds atmost upto x.
+2
+5. Deliverables
+You must submit the following:
+• Report (PDF): A concise write-up (maximum 4–5 pages) documenting your approach,
+the polynomial degree chosen for each problem, the rationale behind it, and any other
+techniques you used.
+• Prediction Files: The two completed test CSV files (one per problem) containing your
+predicted values for y. Refer to the sample submission for the format.
+<ROLLNO> pred var<PRBID>.csv
+• Github Repo: A github repo which contains all the code used to train the models, and
+find inference.
+3
