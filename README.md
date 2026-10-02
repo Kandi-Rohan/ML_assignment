@@ -8,10 +8,9 @@ The implementation uses the assigned datasets only:
 
 ## Reproduce the predictions
 
-Install the dependencies and run:
+Run the inference script from the repository root:
 
 ```text
-python -m pip install -r requirements.txt
 python solve.py
 ```
 
