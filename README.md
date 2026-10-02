@@ -19,7 +19,7 @@ The script evaluates every allowed polynomial degree with five-fold shuffled cro
 - `BT2024259_pred_var1.csv`
 - `BT2024259_pred_var2.csv`
 
-Each prediction file contains only the `y` column, in the same row order as its corresponding test file, matching `sample_submission.csv`.
+Each prediction file contains only the `y` column, in the same row order as its corresponding test file.
 
 ## Model selection
 
