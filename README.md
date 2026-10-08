@@ -12,8 +12,6 @@ Run the inference script from the repository root:
 
 ```text
 python solve.py
-python generate_plots.py
-python make_report.py
 ```
 
 The script compares ordinary least squares, Ridge, Lasso, and Elastic Net polynomial regression. It evaluates every allowed degree and penalty strength with the same five-fold shuffled cross-validation, selects the candidate with the highest mean validation R2, fits that model on all training rows, and writes:
@@ -29,6 +27,20 @@ The complete model-comparison results are also exported to:
 - `model_comparison_var2.csv`
 
 Each row records the degree, method, alpha value (when applicable), mean CV R2, and mean CV MSE.
+
+The generated report and plots are included in the repository:
+
+- `BT2024259_report.pdf`
+- `plots/fig1_var1_mse_and_residuals.png`
+- `plots/fig2_cv_mse_comparison.png`
+- `plots/fig3_var1_best_mse_bars.png`
+- `plots/fig4_actual_vs_predicted.png`
+- `plots/fig5_cv_r2_curves.png`
+- `plots/fig6_var2_best_mse_bars.png`
+- `plots/fig_residuals.png`
+- `plots/fig_residuals_var2.png`
+
+The original assignment instructions are included in `ML_Assignment_1.pdf`.
 
 ## Model selection
 
