@@ -9,9 +9,11 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 ROLL_NO = "BT2024259"
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / ROLL_NO
+# Use the same shuffled folds for every candidate model.
 CV = KFold(n_splits=5, shuffle=True, random_state=42)
 
 
+# These values are tried only for models that use regularization.
 ALPHAS = (0.01, 0.1, 1.0, 10.0)
 
 
@@ -81,6 +83,7 @@ def select_model(train_df, degree_limit):
 
 
 def solve_variant(variant, degree_limit):
+    # Keep each variant's input, predictions, and comparison results separate.
     train_path = DATA_DIR / f"{ROLL_NO}_train_{variant}.csv"
     test_path = DATA_DIR / f"{ROLL_NO}_test_{variant}.csv"
     output_path = ROOT / f"{ROLL_NO}_pred_{variant}.csv"
@@ -90,9 +93,11 @@ def solve_variant(variant, degree_limit):
     best, results = select_model(train_df, degree_limit)
     # Refit the selected pipeline on all training rows before prediction.
     comparison_path = ROOT / f"model_comparison_{variant}.csv"
+    # Save all CV results so the selected model can be checked later.
     pd.DataFrame(results).to_csv(comparison_path, index=False)
     model = build_model(best["degree"], best["method"], best["alpha"])
     model.fit(train_df.drop(columns="y"), train_df["y"])
+    # The test set is used only after model selection is complete.
     predictions = model.predict(test_df)
 
     pd.DataFrame({"y": predictions}).to_csv(output_path, index=False)
