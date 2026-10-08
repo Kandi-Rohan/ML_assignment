@@ -6,13 +6,11 @@ The implementation uses the assigned datasets only:
 - `BT2024259/BT2024259_train_var1.csv` and `BT2024259/BT2024259_test_var1.csv`
 - `BT2024259/BT2024259_train_var2.csv` and `BT2024259/BT2024259_test_var2.csv`
 
-## Reproduce the predictions
+## Included results
 
-Run the inference script from the repository root:
-
-```text
-python solve.py
-```
+The prediction files, model-comparison results, report, and plots are already
+included in this repository. The inference code is provided in `solve.py` for
+reference or for generating the predictions again.
 
 The script compares ordinary least squares, Ridge, Lasso, and Elastic Net polynomial regression. It evaluates every allowed degree and penalty strength with the same five-fold shuffled cross-validation, selects the candidate with the highest mean validation R2, fits that model on all training rows, and writes:
 
