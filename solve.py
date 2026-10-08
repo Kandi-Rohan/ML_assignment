@@ -16,6 +16,7 @@ ALPHAS = (0.01, 0.1, 1.0, 10.0)
 
 
 def build_model(degree, method, alpha=None):
+    # Keep polynomial expansion and scaling inside the CV pipeline.
     if method == "linear":
         regressor = LinearRegression()
     elif method == "ridge":
@@ -41,6 +42,7 @@ def select_model(train_df, degree_limit):
     target = train_df["y"]
     results = []
 
+    # Compare every allowed degree and regularization setting.
     for degree in range(1, degree_limit + 1):
         candidates = [("linear", None)]
         candidates.extend(
@@ -73,6 +75,7 @@ def select_model(train_df, degree_limit):
                 f"CV R2={result['r2']:.4f}, CV MSE={result['mse']:.4f}"
             )
 
+    # Select the candidate with the highest mean validation R2.
     best = max(results, key=lambda result: result["r2"])
     return best, results
 
@@ -85,6 +88,7 @@ def solve_variant(variant, degree_limit):
     test_df = pd.read_csv(test_path)
 
     best, results = select_model(train_df, degree_limit)
+    # Refit the selected pipeline on all training rows before prediction.
     comparison_path = ROOT / f"model_comparison_{variant}.csv"
     pd.DataFrame(results).to_csv(comparison_path, index=False)
     model = build_model(best["degree"], best["method"], best["alpha"])
