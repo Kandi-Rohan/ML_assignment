@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import KFold, cross_val_score
+from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge
+from sklearn.model_selection import KFold, cross_validate
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
@@ -12,27 +12,66 @@ DATA_DIR = ROOT / ROLL_NO
 CV = KFold(n_splits=5, shuffle=True, random_state=42)
 
 
-def build_model(degree):
+ALPHAS = (0.01, 0.1, 1.0, 10.0)
+
+
+def build_model(degree, method, alpha=None):
+    if method == "linear":
+        regressor = LinearRegression()
+    elif method == "ridge":
+        regressor = Ridge(alpha=alpha)
+    elif method == "lasso":
+        regressor = Lasso(alpha=alpha, max_iter=100000)
+    elif method == "elastic_net":
+        regressor = ElasticNet(alpha=alpha, l1_ratio=0.5, max_iter=100000)
+    else:
+        raise ValueError(f"Unknown regression method: {method}")
+
     return Pipeline(
         [
             ("polynomial", PolynomialFeatures(degree=degree, include_bias=False)),
             ("scaler", StandardScaler()),
-            ("regressor", LinearRegression()),
+            ("regressor", regressor),
         ]
     )
 
 
-def select_degree(train_df, degree_limit):
+def select_model(train_df, degree_limit):
     features = train_df.drop(columns="y")
     target = train_df["y"]
     results = []
 
     for degree in range(1, degree_limit + 1):
-        model = build_model(degree)
-        r2 = cross_val_score(model, features, target, cv=CV, scoring="r2")
-        mse = -cross_val_score(model, features, target, cv=CV, scoring="neg_mean_squared_error")
-        results.append({"degree": degree, "r2": r2.mean(), "mse": mse.mean()})
-        print(f"Degree {degree:2d}: CV R2={r2.mean():.4f}, CV MSE={mse.mean():.4f}")
+        candidates = [("linear", None)]
+        candidates.extend(
+            (method, alpha)
+            for method in ("ridge", "lasso", "elastic_net")
+            for alpha in ALPHAS
+        )
+        for method, alpha in candidates:
+            model = build_model(degree, method, alpha)
+            scores = cross_validate(
+                model,
+                features,
+                target,
+                cv=CV,
+                scoring=("r2", "neg_mean_squared_error"),
+                error_score="raise",
+                n_jobs=-1,
+            )
+            result = {
+                "degree": degree,
+                "method": method,
+                "alpha": alpha,
+                "r2": scores["test_r2"].mean(),
+                "mse": -scores["test_neg_mean_squared_error"].mean(),
+            }
+            results.append(result)
+            alpha_text = "" if alpha is None else f", alpha={alpha:g}"
+            print(
+                f"Degree {degree:2d}, {method:12s}{alpha_text:>12s}: "
+                f"CV R2={result['r2']:.4f}, CV MSE={result['mse']:.4f}"
+            )
 
     best = max(results, key=lambda result: result["r2"])
     return best, results
@@ -45,13 +84,20 @@ def solve_variant(variant, degree_limit):
     train_df = pd.read_csv(train_path)
     test_df = pd.read_csv(test_path)
 
-    best, results = select_degree(train_df, degree_limit)
-    model = build_model(best["degree"])
+    best, results = select_model(train_df, degree_limit)
+    comparison_path = ROOT / f"model_comparison_{variant}.csv"
+    pd.DataFrame(results).to_csv(comparison_path, index=False)
+    model = build_model(best["degree"], best["method"], best["alpha"])
     model.fit(train_df.drop(columns="y"), train_df["y"])
     predictions = model.predict(test_df)
 
     pd.DataFrame({"y": predictions}).to_csv(output_path, index=False)
-    print(f"{variant}: degree={best['degree']}, CV R2={best['r2']:.4f}, CV MSE={best['mse']:.4f}")
+    alpha_text = "" if best["alpha"] is None else f", alpha={best['alpha']:g}"
+    print(
+        f"{variant}: method={best['method']}, degree={best['degree']}"
+        f"{alpha_text}, CV R2={best['r2']:.4f}, CV MSE={best['mse']:.4f}"
+    )
+    print(f"Saved {comparison_path}")
     print(f"Saved {output_path}")
     return {"variant": variant, "best": best, "results": results}
 

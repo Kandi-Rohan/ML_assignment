@@ -12,21 +12,30 @@ Run the inference script from the repository root:
 
 ```text
 python solve.py
+python generate_plots.py
+python make_report.py
 ```
 
-The script evaluates every allowed polynomial degree with five-fold shuffled cross-validation, selects the degree with the highest mean validation R2, fits that model on all training rows, and writes:
+The script compares ordinary least squares, Ridge, Lasso, and Elastic Net polynomial regression. It evaluates every allowed degree and penalty strength with the same five-fold shuffled cross-validation, selects the candidate with the highest mean validation R2, fits that model on all training rows, and writes:
 
 - `BT2024259_pred_var1.csv`
 - `BT2024259_pred_var2.csv`
 
 Each prediction file contains only the `y` column, in the same row order as its corresponding test file.
 
+The complete model-comparison results are also exported to:
+
+- `model_comparison_var1.csv`
+- `model_comparison_var2.csv`
+
+Each row records the degree, method, alpha value (when applicable), mean CV R2, and mean CV MSE.
+
 ## Model selection
 
-| Variant | Features | Degrees searched | Selected degree | Mean CV R2 | Mean CV MSE |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| var1 | 6 | 1-10 | 4 | 0.9331 | 0.6799 |
-| var2 | 3 | 1-20 | 8 | 0.9928 | 0.2878 |
+| Variant | Features | Selected method | Degree | Alpha | Mean CV R2 | Mean CV MSE |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| var1 | 6 | Lasso | 5 | 0.01 | 0.9703 | 0.3013 |
+| var2 | 3 | Ridge | 12 | 1 | 0.9935 | 0.2566 |
 
 The full approach and rationale are documented in [BT2024259_report.pdf](BT2024259_report.pdf).
 
